@@ -9,7 +9,11 @@ export namespace UserState {
     reducers: {},
     extraReducers: (builder) => {
       builder.addCase(UserActions.updateUser, (state, { payload }) => {
-        state.user = payload;
+        const { displayName, email, emailVerified, photoURL } = payload;
+        state.user.displayName = displayName;
+        state.user.email = email;
+        state.user.emailVerified = emailVerified;
+        state.user.photoURL = photoURL;
       });
     },
   });
