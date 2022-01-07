@@ -1,19 +1,30 @@
-import { createSelector } from "@reduxjs/toolkit";
-import { useSelector } from "react-redux";
-import { useAppDispatch } from "./reduxToolkit/store/appStore";
+import { useAuthState } from "react-firebase-hooks/auth";
 import "./App.css";
-import { increment } from "./reduxToolkit/store/rootReducer";
-import { selectRoot } from "./reduxToolkit/store/selectRoot";
+import Chat from "./components/chat";
+import SignIn from "./components/signIn";
+import { auth } from "./firebase";
 
 function App() {
-  const { value } = useSelector(
-    createSelector(selectRoot, (state) => state.counterReducer)
-  );
-  const dispatch = useAppDispatch();
+  const [user, loading, error] = useAuthState(auth);
+
+  if (loading) {
+    return (
+      <div>
+        <p>Initialising User...</p>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div>
+        <p>Error: {error}</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="App">
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
-      <button onClick={() => dispatch(increment())}>increment {value}</button>
+    <div className="min-h-screen">
+      <div>{user ? <Chat /> : <SignIn />}</div>
     </div>
   );
 }
