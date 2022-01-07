@@ -3,10 +3,12 @@ import {
   signInWithPopup,
   FacebookAuthProvider,
 } from "firebase/auth";
-
 import { auth } from "../firebase";
+import { useAppDispatch } from "../reduxToolkit/store/appStore";
+import { UserActions } from "../reduxToolkit/store/user/userAction";
 
 function SignIn() {
+  const dispatch = useAppDispatch();
   const providerGoogle = new GoogleAuthProvider();
   const providerFacebook = new FacebookAuthProvider();
   const signInWithGoogle = () => {
@@ -14,7 +16,7 @@ function SignIn() {
       .then((result) => {
         // const credential = GoogleAuthProvider.credentialFromResult(result);
         // const token = credential?.accessToken;
-        console.log(result);
+        dispatch(UserActions.updateUser(result.user));
       })
       .catch((error) => {
         // const errorCode = error.code;
