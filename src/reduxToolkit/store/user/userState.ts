@@ -10,10 +10,10 @@ export namespace UserState {
     extraReducers: (builder) => {
       builder.addCase(UserActions.updateUser, (state, { payload }) => {
         const { displayName, email, emailVerified, photoURL } = payload;
-        state.user.displayName = displayName;
-        state.user.email = email;
-        state.user.emailVerified = emailVerified;
-        state.user.photoURL = photoURL;
+        state.displayName = displayName;
+        state.email = email;
+        state.emailVerified = emailVerified;
+        state.photoURL = photoURL;
       });
     },
   });
