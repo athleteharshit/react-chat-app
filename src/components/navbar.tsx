@@ -1,20 +1,23 @@
 /* This Navbar requires Tailwind CSS v2.0+ */
 import { Fragment } from "react";
+import { useSelector } from "react-redux";
+
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
+import { UserSelectors } from "../reduxToolkit/store/user/userSelector";
+import SignOut from "./signOut";
 
-const navigation = [
-  { name: "Dashboard", href: "#", current: true },
-  { name: "Team", href: "#", current: false },
-  { name: "Projects", href: "#", current: false },
-  { name: "Calendar", href: "#", current: false },
-];
+const navigation = [{ name: "Dashboard", href: "#", current: true }];
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function Navbar() {
+  const { displayName, email, emailVerified, photoURL } = useSelector(
+    UserSelectors.user
+  );
+
   return (
     <Disclosure as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -50,7 +53,6 @@ export default function Navbar() {
                     {navigation.map((item) => (
                       <div
                         key={item.name}
-                        // href={item.href}
                         className={classNames(
                           item.current
                             ? "bg-gray-900 text-white"
@@ -62,8 +64,24 @@ export default function Navbar() {
                         {item.name}
                       </div>
                     ))}
+                    <div
+                      className={classNames(
+                        "text-gray-300 hover:bg-gray-700 hover:text-white",
+                        "px-3 py-2 rounded-md text-sm font-medium"
+                      )}
+                    >
+                      <SignOut />
+                    </div>
                   </div>
                 </div>
+              </div>
+              <div
+                className={classNames(
+                  "text-gray-300 hover:bg-gray-700 hover:text-white",
+                  "px-3 py-2 rounded-md text-sm font-medium"
+                )}
+              >
+                {displayName ? displayName : "none"}
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                 <button
@@ -81,7 +99,11 @@ export default function Navbar() {
                       <span className="sr-only">Open user menu</span>
                       <img
                         className="h-8 w-8 rounded-full"
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                        src={
+                          photoURL
+                            ? photoURL
+                            : "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                        }
                         alt=""
                       />
                     </Menu.Button>
@@ -105,7 +127,7 @@ export default function Navbar() {
                               "block px-4 py-2 text-sm text-gray-700"
                             )}
                           >
-                            Your Profile
+                            {displayName ? displayName : "-"}
                           </div>
                         )}
                       </Menu.Item>
@@ -118,7 +140,7 @@ export default function Navbar() {
                               "block px-4 py-2 text-sm text-gray-700"
                             )}
                           >
-                            Settings
+                            {email ? email : "-"}
                           </div>
                         )}
                       </Menu.Item>
@@ -130,7 +152,7 @@ export default function Navbar() {
                               "block px-4 py-2 text-sm text-gray-700"
                             )}
                           >
-                            Sign out
+                            <SignOut />
                           </div>
                         )}
                       </Menu.Item>
