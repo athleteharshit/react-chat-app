@@ -1,6 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { signInWithGoogle, USER, USER_INITIAL_STATE } from "./userModel";
-import { setUser, signIn } from "../../../utils/firebase/function";
+import {
+  signInWithGoogle,
+  signOutWithGoogle,
+  USER,
+  USER_INITIAL_STATE,
+} from "./userModel";
+import {
+  logOut,
+  setUser,
+  signIn,
+  updateUser,
+} from "../../../utils/firebase/function";
 import { serverTimestamp } from "firebase/firestore";
 
 export namespace UserState {
@@ -20,6 +30,19 @@ export namespace UserState {
         const payload = { displayName, email, emailVerified, photoURL };
         console.log(user, result);
         return payload;
+      } catch (error) {
+        return rejectWithValue(error);
+      }
+    }
+  );
+
+  export const signOutUserWithGoogle = createAsyncThunk(
+    signOutWithGoogle,
+    async (uid, { rejectWithValue }) => {
+      try {
+        await updateUser(uid);
+        await logOut();
+        return {};
       } catch (error) {
         return rejectWithValue(error);
       }

@@ -14,3 +14,4 @@ export const USER_INITIAL_STATE: User = {
 
 export const USER = "user";
 export const signInWithGoogle = "signInWithGoogle";
+export const signOutWithGoogle = "signOutWithGoogle";
