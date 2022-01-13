@@ -23,6 +23,7 @@ export namespace UserState {
         const { displayName, uid, email, emailVerified, photoURL }: any = user;
         const createUser = {
           uid,
+          photoURL,
           name: displayName,
           createdAt: serverTimestamp(),
           isOnline: true,
@@ -33,6 +34,7 @@ export namespace UserState {
           theme: "dark",
         });
         const payload = { displayName, email, emailVerified, photoURL };
+        localStorage.setItem("user", JSON.stringify(payload));
         console.log(user, result);
         return payload;
       } catch (error) {
@@ -47,6 +49,7 @@ export namespace UserState {
       try {
         await updateUser(uid);
         await logOut();
+        localStorage.clear();
         toast.success(`logout successfully`, {
           transition: Zoom,
           theme: "dark",

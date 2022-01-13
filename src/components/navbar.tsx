@@ -1,4 +1,3 @@
-/* This Navbar requires Tailwind CSS v2.0+ */
 import { Fragment } from "react";
 import { useSelector } from "react-redux";
 
@@ -6,6 +5,8 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
 import { UserSelectors } from "../reduxToolkit/store/user/userSelector";
 import SignOut from "./signOut";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../firebase";
 
 const navigation = [{ name: "Dashboard", href: "#", current: true }];
 
@@ -14,6 +15,8 @@ function classNames(...classes: any) {
 }
 
 export default function Navbar() {
+  const [user] = useAuthState(auth);
+  // const { displayName, email, photoURL }: any = user;
   const { displayName, email, photoURL } = useSelector(UserSelectors.user);
 
   return (
