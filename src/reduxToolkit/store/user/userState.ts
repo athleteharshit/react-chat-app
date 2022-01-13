@@ -12,6 +12,7 @@ import {
   updateUser,
 } from "../../../utils/firebase/function";
 import { serverTimestamp } from "firebase/firestore";
+import { toast, Zoom } from "react-toastify";
 
 export namespace UserState {
   export const signInUserWithGoogle = createAsyncThunk(
@@ -27,6 +28,10 @@ export namespace UserState {
           isOnline: true,
         };
         const result = await setUser(createUser);
+        toast.success(`${displayName} is login successfully`, {
+          transition: Zoom,
+          theme: "dark",
+        });
         const payload = { displayName, email, emailVerified, photoURL };
         console.log(user, result);
         return payload;
@@ -42,6 +47,10 @@ export namespace UserState {
       try {
         await updateUser(uid);
         await logOut();
+        toast.success(`logout successfully`, {
+          transition: Zoom,
+          theme: "dark",
+        });
         return {};
       } catch (error) {
         return rejectWithValue(error);
@@ -66,6 +75,12 @@ export namespace UserState {
         signInUserWithGoogle.rejected,
         (state, { payload }) => {}
       );
+      builder.addCase(signOutUserWithGoogle.fulfilled, (state, { payload }) => {
+        state.displayName = "";
+        state.email = "";
+        state.emailVerified = false;
+        state.photoURL = "";
+      });
     },
   });
 }
