@@ -38,7 +38,7 @@ export namespace UserState {
 
   export const signOutUserWithGoogle = createAsyncThunk(
     signOutWithGoogle,
-    async (uid, { rejectWithValue }) => {
+    async (uid: string | undefined, { rejectWithValue }) => {
       try {
         await updateUser(uid);
         await logOut();

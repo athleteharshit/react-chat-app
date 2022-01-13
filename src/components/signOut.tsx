@@ -7,7 +7,7 @@ function SignOut() {
   const dispatch = useAppDispatch();
   const [user] = useAuthState(auth);
   const signOutWithGoogle = () => {
-    dispatch(UserState.signOutUserWithGoogle());
+    dispatch(UserState.signOutUserWithGoogle(user?.uid));
   };
   return <div onClick={signOutWithGoogle}>Sign out</div>;
 }
