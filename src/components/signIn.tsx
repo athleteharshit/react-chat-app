@@ -1,47 +1,13 @@
-import {
-  GoogleAuthProvider,
-  signInWithPopup,
-  FacebookAuthProvider,
-} from "firebase/auth";
-import { auth } from "../firebase";
 import { useAppDispatch } from "../reduxToolkit/store/appStore";
-import { UserActions } from "../reduxToolkit/store/user/userAction";
+import { UserState } from "../reduxToolkit/store/user/userState";
 
 function SignIn() {
   const dispatch = useAppDispatch();
-  const providerGoogle = new GoogleAuthProvider();
-  const providerFacebook = new FacebookAuthProvider();
   const signInWithGoogle = () => {
-    signInWithPopup(auth, providerGoogle)
-      .then((result) => {
-        // const credential = GoogleAuthProvider.credentialFromResult(result);
-        // const token = credential?.accessToken;
-        dispatch(UserActions.updateUser(result.user));
-      })
-      .catch((error) => {
-        // const errorCode = error.code;
-        // const errorMessage = error.message;
-        // const email = error.email;
-        // const credential = GoogleAuthProvider.credentialFromError(error);
-        console.log(error);
-      });
+    dispatch(UserState.signInUserWithGoogle());
   };
 
-  const signInWithFacebook = () => {
-    signInWithPopup(auth, providerFacebook)
-      .then((result) => {
-        // const credential = FacebookAuthProvider.credentialFromResult(result);
-        // const accessToken = credential?.accessToken;
-        console.log(result);
-      })
-      .catch((error) => {
-        // const errorCode = error.code;
-        // const errorMessage = error.message;
-        // const email = error.email;
-        // const credential = FacebookAuthProvider.credentialFromError(error);
-        console.log(error);
-      });
-  };
+  const signInWithFacebook = () => {};
 
   return (
     <div className="bg-gray-50 h-full">
