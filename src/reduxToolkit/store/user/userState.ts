@@ -9,7 +9,7 @@ export namespace UserState {
     async (id, { rejectWithValue }) => {
       try {
         const user = await signIn();
-        const { displayName, uid }: any = user;
+        const { displayName, uid, email, emailVerified, photoURL }: any = user;
         const createUser = {
           uid,
           name: displayName,
@@ -17,8 +17,9 @@ export namespace UserState {
           isOnline: true,
         };
         const result = await setUser(createUser);
+        const payload = { displayName, email, emailVerified, photoURL };
         console.log(user, result);
-        return user;
+        return payload;
       } catch (error) {
         return rejectWithValue(error);
       }
@@ -32,7 +33,7 @@ export namespace UserState {
     extraReducers: (builder) => {
       builder.addCase(signInUserWithGoogle.pending, (state, { payload }) => {});
       builder.addCase(signInUserWithGoogle.fulfilled, (state, { payload }) => {
-        const { displayName, email, emailVerified, photoURL }: any = payload;
+        const { displayName, email, emailVerified, photoURL } = payload;
         state.displayName = displayName;
         state.email = email;
         state.emailVerified = emailVerified;

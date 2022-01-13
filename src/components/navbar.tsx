@@ -14,9 +14,7 @@ function classNames(...classes: any) {
 }
 
 export default function Navbar() {
-  const { displayName, email, emailVerified, photoURL } = useSelector(
-    UserSelectors.user
-  );
+  const { displayName, email, photoURL } = useSelector(UserSelectors.user);
 
   return (
     <Disclosure as="nav" className="bg-gray-800">
