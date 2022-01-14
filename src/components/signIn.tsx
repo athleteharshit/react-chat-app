@@ -1,20 +1,13 @@
 import { useAppDispatch } from "../reduxToolkit/store/appStore";
 import { UserState } from "../reduxToolkit/store/user/userState";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../firebase";
-import { useEffect } from "react";
-import { Redirect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function SignIn() {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [user] = useAuthState(auth);
-
-  useEffect(() => {
-    if (user) <Redirect to="/chat" />;
-  }, [user]);
 
   const signInWithGoogle = () => {
-    dispatch(UserState.signInUserWithGoogle());
+    dispatch(UserState.signInUserWithGoogle(navigate));
   };
 
   const signInWithFacebook = () => {};

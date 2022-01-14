@@ -1,13 +1,5 @@
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import {
-  collection,
-  doc,
-  onSnapshot,
-  query,
-  setDoc,
-  updateDoc,
-  where,
-} from "firebase/firestore";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 import { User } from "../../types/user";
 const providerGoogle = new GoogleAuthProvider();
@@ -61,21 +53,22 @@ export const updateUser = (uid: string | undefined) => {
   });
 };
 
-export const userList = (uid: string | undefined) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      if (uid) {
-        const q = query(collection(db, "users"));
-        onSnapshot(q, (querySnapshot) => {
-          let users: any[] = [];
-          querySnapshot.forEach((doc) => {
-            if (doc.data().uid !== uid) users.push(doc.data());
-          });
-          resolve(users);
-        });
-      }
-    } catch (error) {
-      reject(error);
-    }
-  });
-};
+// export const userList = (uid: string | undefined) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       if (uid) {
+//         const q = query(collection(db, "users"));
+//         onSnapshot(q, (querySnapshot) => {
+//           let users: any[] = [];
+//           querySnapshot.forEach((doc) => {
+//             if (doc.data().uid !== uid) users.push(doc.data());
+//           });
+//           console.log(users, "snapshot");
+//           resolve([...users]);
+//         });
+//       }
+//     } catch (error) {
+//       reject(error);
+//     }
+//   });
+// };

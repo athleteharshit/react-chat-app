@@ -1,31 +1,42 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { ChatItem } from "react-chat-elements";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useAppDispatch } from "../reduxToolkit/store/appStore";
-import { auth } from "../firebase";
-import { ChatListState } from "../reduxToolkit/store/user/chatListState";
-import { useSelector } from "react-redux";
-import { UserSelectors } from "../reduxToolkit/store/user/userSelector";
+import { auth, db } from "../firebase";
+import { collection, onSnapshot, query } from "firebase/firestore";
 
 function ChatList() {
+  const [users, setUsers] = useState<any[]>([]);
   const [user] = useAuthState(auth);
-  const dispatch = useAppDispatch();
-  const { users } = useSelector(UserSelectors.userList);
 
   useEffect(() => {
-    dispatch(ChatListState.fetchUserList(user?.uid));
+    if (user?.uid) {
+      const q = query(collection(db, "users"));
+      onSnapshot(q, (querySnapshot) => {
+        let users: any[] = [];
+        querySnapshot.forEach((doc) => {
+          if (doc.data().uid !== user?.uid) {
+            users.push(doc.data());
+          }
+        });
+        setUsers([...users]);
+      });
+    }
   }, [user?.uid]);
-  console.log("users", users);
+
   return (
     <div>
-      <ChatItem
-        avatar={"https://facebook.github.io/react/img/logo.svg"}
-        alt={"Reactjs"}
-        title={"Facebook"}
-        subtitle={"What are you doing?"}
-        date={new Date()}
-        unread={0}
-      />
+      {users?.length > 0 &&
+        users.map((user: any) => (
+          <ChatItem
+            key={user.uid}
+            avatar={user.photoURL}
+            alt={user.name}
+            title={user.name}
+            subtitle={user.isOnline ? "Online" : "Offline"}
+            // date={user.createdAt.seconds}
+            // unread={0}
+          />
+        ))}
     </div>
   );
 }

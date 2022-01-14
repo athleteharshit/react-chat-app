@@ -1,27 +1,14 @@
-import { Route, Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+// import { useAuthState } from "react-firebase-hooks/auth";
+// import { auth } from "../firebase";
 
-/**
- * @author
- * @function PrivateRoute
- **/
+const PrivateRoute = ({ children }: any) => {
+  // const [user] = useAuthState(auth);
+  const userL = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user") || "")
+    : null;
 
-const PrivateRoute = ({ component: Component, ...rest }: any) => {
-  return (
-    <Route
-      {...rest}
-      component={(props: any) => {
-        const user = localStorage.getItem("user")
-          ? JSON.parse(localStorage.getItem("user") || "")
-          : null;
-
-        if (user) {
-          return <Component {...props} />;
-        } else {
-          return <Redirect to={`/`} />;
-        }
-      }}
-    />
-  );
+  return userL ? children : <Navigate to="/" />;
 };
 
 export default PrivateRoute;

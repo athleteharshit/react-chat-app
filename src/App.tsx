@@ -1,32 +1,24 @@
-import { Switch, Route } from "react-router-dom";
 import "./App.css";
 import Chat from "./components/chat";
-import PrivateRoute from "./components/privateRoute";
 import SignIn from "./components/signIn";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { Routes, Route } from "react-router-dom";
+import PrivateRoute from "./components/privateRoute";
 
 function App() {
   return (
-    <Switch>
-      <div className="min-h-screen">
-        <Route exact path="/">
-          <SignIn />
-        </Route>
-        <PrivateRoute path="/chat" exact component={<Chat />} />
-      </div>
-      <ToastContainer
-        position="top-center"
-        autoClose={4000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-    </Switch>
+    <div>
+      <Routes>
+        <Route path="/" element={<SignIn />} />
+        <Route
+          path="/chat"
+          element={
+            <PrivateRoute>
+              <Chat />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+    </div>
   );
 }
 

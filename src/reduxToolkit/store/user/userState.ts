@@ -17,7 +17,7 @@ import { toast, Zoom } from "react-toastify";
 export namespace UserState {
   export const signInUserWithGoogle = createAsyncThunk(
     signInWithGoogle,
-    async (id, { rejectWithValue }) => {
+    async (navigate: any, { rejectWithValue }) => {
       try {
         const user = await signIn();
         const { displayName, uid, email, emailVerified, photoURL }: any = user;
@@ -35,7 +35,7 @@ export namespace UserState {
         });
         const payload = { displayName, email, emailVerified, photoURL };
         localStorage.setItem("user", JSON.stringify(payload));
-        console.log(user, result);
+        navigate("/chat");
         return payload;
       } catch (error) {
         return rejectWithValue(error);
@@ -45,7 +45,7 @@ export namespace UserState {
 
   export const signOutUserWithGoogle = createAsyncThunk(
     signOutWithGoogle,
-    async (uid: string | undefined, { rejectWithValue }) => {
+    async ({ uid, navigate }: any, { rejectWithValue }) => {
       try {
         await updateUser(uid);
         await logOut();
@@ -54,6 +54,7 @@ export namespace UserState {
           transition: Zoom,
           theme: "dark",
         });
+        navigate("/");
         return {};
       } catch (error) {
         return rejectWithValue(error);
