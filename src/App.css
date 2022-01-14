@@ -1,0 +1,10 @@
+.mainDiv {
+  height: 90vh;
+}
+
+.centerDiv {
+  height: 70vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding: 5px;
+}
