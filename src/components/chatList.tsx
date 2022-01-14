@@ -16,7 +16,11 @@ function ChatList({ users, onClick }: ChatListProps) {
             avatar={user.photoURL}
             alt={user.name}
             title={user.name}
-            subtitle={user.isOnline ? "Online" : "Offline"}
+            subtitle={
+              <p className={`${user.isOnline ? "text-green-600" : ""}`}>
+                {user.isOnline ? "Online" : "Offline"}
+              </p>
+            }
             // date={user.createdAt.seconds}
             // unread={0}
           />

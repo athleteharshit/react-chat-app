@@ -2,14 +2,26 @@ import ChatList from "./chatList";
 import Navbar from "./navbar";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../firebase";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  where,
+} from "firebase/firestore";
 import { useState, useEffect, useRef } from "react";
+import { MessageBox } from "react-chat-elements";
 
 function Chat() {
   const [users, setUsers] = useState<any[]>([]);
   const divRef = useRef<any>(null);
   const [chatStarted, setChatStarted] = useState(false);
   const [chatUser, setChatUser] = useState<any>({});
+  const [message, setMessage] = useState("");
+  const [userUid, setUserUid] = useState(null);
+  const [userConversation, setUserConversation] = useState<any[]>([]);
   const [user] = useAuthState(auth);
 
   useEffect(() => {
@@ -43,10 +55,41 @@ function Chat() {
     }
   };
 
-  const onClick = (user: any) => {
-    console.log(user);
+  const onClick = (secondUser: any) => {
     setChatStarted(true);
-    setChatUser(user);
+    setChatUser(secondUser);
+    setUserUid(secondUser.uid);
+
+    const q = query(
+      collection(db, "conversations"),
+      where("user_uid_1", "in", [user?.uid, secondUser.uid]),
+      orderBy("createdAt", "asc")
+    );
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const conversations: any[] = [];
+      querySnapshot.forEach((doc) => {
+        conversations.push(doc.data());
+      });
+      setUserConversation([...conversations]);
+    });
+  };
+
+  const submitMessage = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const msgObj = {
+      user_uid_1: user?.uid,
+      user_uid_2: userUid,
+      message,
+    };
+
+    if (message !== "") {
+      const docRef = await addDoc(collection(db, "conversations"), {
+        ...msgObj,
+        isView: false,
+        createdAt: serverTimestamp(),
+      });
+      setMessage("");
+    }
   };
 
   return (
@@ -65,17 +108,19 @@ function Chat() {
           <div className="centerDiv">
             {chatStarted ? (
               <div>
-                temporibus est, earum placeat quidem animi dolorum quibusdam,
-                beatae recusandae molestiae, dolore explicabo nam adipisci id ab
-                reprehenderit accusantium nemo voluptates. Vel, perspiciatis,
-                minima nobis, suscipit iure blanditiis hic eius ducimus
-                perferendis veritatis harum quaerat itaque! Nam soluta
-                accusantium accusamus incidunt ullam magnam. Debitis accusantium
-                consequuntur! Ex illo id sapiente temporibus expedita suscipit,
-                a vero dolore ipsum quo laudantium facilis eaque molestiae iure
-                vel voluptatibus optio quod odio dolorem ratione fuga et
-                cupiditate nesciunt. Iure repellendus ut et porro consectetur!
-                Nulla, quis.
+                {userConversation.length > 0 &&
+                  userConversation.map((msg, index) => {
+                    return (
+                      <MessageBox
+                        key={index}
+                        position={
+                          msg.user_uid_1 == user?.uid ? "right" : "left"
+                        }
+                        type={"text"}
+                        text={msg.message}
+                      />
+                    );
+                  })}
               </div>
             ) : null}
             <div ref={divRef}></div>
@@ -84,20 +129,20 @@ function Chat() {
             {chatStarted ? (
               <div>
                 <input
-                  // id="password"
-                  // name="password"
-                  // type="password"
-                  // autoComplete="current-password"
+                  type="text"
                   required
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                   placeholder="Message"
                 />
                 <button
                   type="submit"
                   className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  onClick={submitMessage}
                 >
                   <span className="absolute left-0 inset-y-0 flex items-center pl-3"></span>
-                  Sign in
+                  Send
                 </button>
               </div>
             ) : null}
