@@ -5,10 +5,16 @@ import { auth, db } from "../firebase";
 import {
   addDoc,
   collection,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
+  setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { useState, useEffect, useRef } from "react";
@@ -22,6 +28,7 @@ function Chat() {
   const [message, setMessage] = useState("");
   const [userUid, setUserUid] = useState(null);
   const [userConversation, setUserConversation] = useState<any[]>([]);
+  const [groupChatId, setGroupChatId] = useState<any>(null);
   const [user] = useAuthState(auth);
 
   useEffect(() => {
@@ -45,6 +52,46 @@ function Chat() {
     }
   }, [divRef]);
 
+  const hashString = (str: string | null | undefined): number => {
+    let hash = 0;
+    if (str) {
+      for (let i = 0; i < str.length; i++) {
+        hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
+        hash = hash & hash; // Convert to 32bit integer
+      }
+    }
+    return hash;
+  };
+
+  useEffect(() => {
+    let unsubscribe: any;
+    async function receivedMessage() {
+      if (userUid) {
+        if (hashString(user?.uid) <= hashString(userUid)) {
+          setGroupChatId(`${user?.uid}-${userUid}`);
+        } else {
+          setGroupChatId(`${userUid}-${user?.uid}`);
+        }
+        if (groupChatId) {
+          const q = query(
+            collection(db, "room", groupChatId, "message"),
+            orderBy("createdAt", "asc")
+          );
+          unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const conversations: any[] = [];
+            querySnapshot.forEach((doc) => {
+              conversations.push(doc.data());
+            });
+            setUserConversation([...conversations]);
+          });
+        }
+      }
+    }
+
+    receivedMessage();
+    return () => unsubscribe;
+  }, [chatUser, groupChatId]);
+
   const scrollToBottom = () => {
     if (divRef.current) {
       divRef.current?.scrollIntoView({
@@ -57,37 +104,26 @@ function Chat() {
 
   const onClick = (secondUser: any) => {
     setChatStarted(true);
-    setChatUser(secondUser);
     setUserUid(secondUser.uid);
-
-    const q = query(
-      collection(db, "conversations"),
-      where("user_uid_1", "in", [user?.uid, secondUser.uid]),
-      orderBy("createdAt", "asc")
-    );
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const conversations: any[] = [];
-      querySnapshot.forEach((doc) => {
-        conversations.push(doc.data());
-      });
-      setUserConversation([...conversations]);
-    });
+    setChatUser(secondUser);
   };
 
   const submitMessage = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const msgObj = {
-      user_uid_1: user?.uid,
-      user_uid_2: userUid,
       message,
+      uid_one: user?.uid,
+      uid_two: userUid,
     };
 
-    if (message !== "") {
-      const docRef = await addDoc(collection(db, "conversations"), {
-        ...msgObj,
-        isView: false,
-        createdAt: serverTimestamp(),
-      });
+    if (message !== "" && groupChatId) {
+      const docRef = await addDoc(
+        collection(db, "room", groupChatId, "message"),
+        {
+          ...msgObj,
+          createdAt: serverTimestamp(),
+        }
+      );
       setMessage("");
     }
   };
@@ -113,9 +149,7 @@ function Chat() {
                     return (
                       <MessageBox
                         key={index}
-                        position={
-                          msg.user_uid_1 == user?.uid ? "right" : "left"
-                        }
+                        position={msg?.uid_one == user?.uid ? "right" : "left"}
                         type={"text"}
                         text={msg.message}
                       />
