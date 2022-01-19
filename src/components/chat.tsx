@@ -5,17 +5,10 @@ import { auth, db } from "../firebase";
 import {
   addDoc,
   collection,
-  doc,
-  getDoc,
-  getDocs,
-  limit,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
-  setDoc,
-  updateDoc,
-  where,
 } from "firebase/firestore";
 import { useState, useEffect, useRef } from "react";
 import { MessageBox } from "react-chat-elements";
@@ -26,9 +19,9 @@ function Chat() {
   const [chatStarted, setChatStarted] = useState(false);
   const [chatUser, setChatUser] = useState<any>({});
   const [message, setMessage] = useState("");
-  const [userUid, setUserUid] = useState(null);
+  const [userUid, setUserUid] = useState<string | null>(null);
   const [userConversation, setUserConversation] = useState<any[]>([]);
-  const [groupChatId, setGroupChatId] = useState<any>(null);
+  const [groupChatId, setGroupChatId] = useState<string | null>(null);
   const [user] = useAuthState(auth);
 
   useEffect(() => {
